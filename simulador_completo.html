@@ -32,16 +32,16 @@
 <section id="clientes">
   <h2>Registro de Clientes</h2>
 
-  <input type="text" >
-  <input type="text" >
-  <input type="text" >
-  <input type="number" >
-  <input type="number" >
+  <input type="text" id="cedula" placeholder="Cédula">
+  <input type="text" id="nombre" placeholder="Nombre">
+  <input type="text" id="apellido" placeholder="Apellido">
+  <input type="number" id="ingresos" placeholder="Ingresos">
+  <input type="number" id="egresos" placeholder="Egresos">
 
   <br>
 
-  <button >Guardar cliente</button>
-  <button >Limpiar</button>
+  <button onclick="guardarCliente()">Guardar cliente</button>
+  <button onclick="limpiar()">Limpiar</button>
 
   <table>
     <thead>
@@ -56,43 +56,19 @@
     </thead>
     <tbody id="tablaClientes">
        <tr>
-          <td>1712345678</td>
-          <td>Juan</td>
-          <td>Pérez</td>
-          <td>1200</td>
-          <td>500</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
           <td>
             <button>Actualizar</button>
             <button>Eliminar</button>
           </td>
-        </tr>
-        <tr>
-          <td>1723456789</td>
-          <td>María</td>
-          <td>Gómez</td>
-          <td>1500</td>
-          <td>600</td>
-          <td>
-            <button>Actualizar</button>
-            <button>Eliminar</button>
-          </td>
-        </tr>
-        <tr>
-          <td>1734567890</td>
-          <td>Carlos</td>
-          <td>Ramírez</td>
-          <td>900</td>
-          <td>350</td>
-          <td>
-            <button>Actualizar</button>
-            <button>Eliminar</button>
-          </td>
-        </tr>
+        </tr>        
     </tbody>
   </table>
-</section>
-
-
+  </section>
 
 <script src="simulador_completo.js"></script>
 <script src="utilitarios.js"></script>
