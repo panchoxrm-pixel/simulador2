@@ -14,6 +14,7 @@
 function ocultarSecciones(){
     document.getElementById("parametros").classList.remove("activa");
     document.getElementById("clientes").classList.remove("activa");
+    document.getElementById("credito").classList.remove("activa");
 }
 
 function mostrarSeccion(id){
@@ -25,6 +26,7 @@ function guardarTasa(){
   let tasaEntero = recuperarInt("tasaInteres");
   if(tasaEntero >= 10 && tasaEntero <= 20){
     mostrarTexto("mensajeTasa",`Tasa configurada correctamente: ${tasaEntero} %`);
+    tasaInteres = tasaEntero;
   } else {
         mostrarTexto("mensajeTasa",`La tasa debe estar entre 10 % y 20 %`);
   }    
@@ -107,3 +109,61 @@ function seleccionarCliente(cedula){
         mostrarTextoEnCaja("ingresos","");
         mostrarTextoEnCaja("egresos","");
         }
+
+  function buscarClienteCredito(){
+    let idCajadeTexto = document.getElementById("buscarCedulaCredito");
+    let cedulaIngresada = idCajadeTexto.value;
+    let resultadoBusqueda = buscarCliente(cedulaIngresada);
+    
+    let contenedorDatos = document.getElementById("datosClienteCredito");
+    
+    if(resultadoBusqueda == null){
+      contenedorDatos.innerHTML = "Cliente no encontrado";
+      } else {
+        clienteSeleccionado = resultadoBusqueda;
+        contenedorDatos.innerHTML = `
+          <h3>Datos del Cliente</h3>
+          <p><strong>Cédula: </strong>${resultadoBusqueda.cedula}</p>
+          <p><strong>Nombre: </strong>${resultadoBusqueda.nombre}</p>
+          <p><strong>Apellido: </strong>${resultadoBusqueda.apellido}</p>
+          <p><strong>Ingresos: </strong>$ ${resultadoBusqueda.ingresos}</p>
+          <p><strong>Egresos: </strong>$ ${resultadoBusqueda.egresos}</p>
+          `;
+      }
+  }
+
+  function calcularCredito() {
+
+    if(clienteSeleccionado == null){
+      alert("Primero debe buscar un cliente por cédula");
+      return;
+    }
+
+    let ingresos = clienteSeleccionado.ingresos;
+    let egresos = clienteSeleccionado.egresos;
+
+    let valorDisponibleFloat = calcularDisponible(ingresos, egresos);
+
+    let capacidadPago = calcularCapacidadPago(valorDisponibleFloat);
+
+    let monto = parseFloat(document.getElementById("montoCredito").value) || 0;
+    // Va el cero por si acaso ingresan erróneamente algún dato o lo dejan vacío, lo cual devolvería NaN.
+
+    let plazoAnios = parseInt(document.getElementById("plazoCredito").value) || 0;
+
+    let interesSimple = calcularInteresSimple(monto, tasaInteres, plazoAnios);
+    let totalPagar = calcularTotalPagar(monto, interesSimple);
+    let cuotaMensual = calcularCuotaMensual(totalPagar, plazoAnios);
+
+    let resultadoCredito = document.getElementById("resultadoCredito");
+    let analisisCredito = aprobarCredito(capacidadPago, cuotaMensual);
+
+    resultadoCredito.innerHTML = `
+        Capacidad de pago: $ ${capacidadPago.toFixed(2)} <br>
+        Total a pagar: $ ${totalPagar.toFixed(2)} <br>
+        Cuota mensual: $ ${cuotaMensual.toFixed(2)} <br>
+        <strong>Resultado: ${analisisCredito ? "Aprobado" : "Rechazado"}</strong>
+    `;
+
+    resultadoCredito.className = analisisCredito ? "aprobado" : "rechazado";
+  }
