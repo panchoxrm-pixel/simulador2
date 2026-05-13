@@ -15,6 +15,7 @@ function ocultarSecciones(){
     document.getElementById("parametros").classList.remove("activa");
     document.getElementById("clientes").classList.remove("activa");
     document.getElementById("credito").classList.remove("activa");
+    document.getElementById("listaCreditos").classList.remove("activa");
 }
 
 function mostrarSeccion(id){
@@ -61,8 +62,10 @@ function guardarCliente(){
 function pintarClientes(){
   let bodyTabla = document.getElementById("tablaClientes");
   let contenidoTabla = "";
+
   for(let i = 0; i < clientes.length; i ++){
   let arregloClientes = clientes[i]
+
   contenidoTabla += 
     `<tr>
           <td> ${arregloClientes.cedula} </td>
@@ -93,7 +96,7 @@ function buscarCliente(cedula){
 }
 
 function seleccionarCliente(cedula){
-  let clienteSeleccionado = buscarCliente(cedula);
+  clienteSeleccionado = buscarCliente(cedula);
 
         mostrarTextoEnCaja("cedula",clienteSeleccionado.cedula);
         mostrarTextoEnCaja("nombre",clienteSeleccionado.nombre);
@@ -118,7 +121,16 @@ function seleccionarCliente(cedula){
     let contenedorDatos = document.getElementById("datosClienteCredito");
     
     if(resultadoBusqueda == null){
+
+      clienteSeleccionado = null; // Resetea la variable global para que calcularCredito falle
+      document.getElementById("resultadoCredito").innerHTML = ""; // Borra la tabla de resultados
+      document.getElementById("btnAsignarCredito").disabled = true; // Deshabilita el botón
+
+      document.getElementById("montoCredito").value = "";
+      document.getElementById("plazoCredito").value = "";
+
       contenedorDatos.innerHTML = "Cliente no encontrado";
+
       } else {
         clienteSeleccionado = resultadoBusqueda;
         contenedorDatos.innerHTML = `
@@ -162,8 +174,74 @@ function seleccionarCliente(cedula){
         Capacidad de pago: $ ${capacidadPago.toFixed(2)} <br>
         Total a pagar: $ ${totalPagar.toFixed(2)} <br>
         Cuota mensual: $ ${cuotaMensual.toFixed(2)} <br>
-        <strong>Resultado: ${analisisCredito ? "Aprobado" : "Rechazado"}</strong>
+        <strong>Resultado: ${analisisCredito ? "Aprobado" : "Rechazado"}</strong>        
     `;
 
+    cuotaCalculada = cuotaMensual;
+    montoCalculado = monto;
+    plazoCalculado = plazoAnios;
+        
+    let idbtnAsignarCredito = document.getElementById("btnAsignarCredito");
+
+    if (analisisCredito == false){
+      idbtnAsignarCredito.disabled = true;
+    } else {
+      idbtnAsignarCredito.disabled = false;
+    }      
+  
     resultadoCredito.className = analisisCredito ? "aprobado" : "rechazado";
   }
+
+  function asignarCredito(){
+    let credito = {
+      cedula: clienteSeleccionado.cedula,
+      nombre: clienteSeleccionado.nombre,
+      apellido: clienteSeleccionado.apellido,
+      monto: montoCalculado,
+      tasa: tasaInteres,
+      plazo: plazoCalculado, //Decía plazoIngresado, le cambié porque no coincidía con el nombre con el global
+      cuota: cuotaCalculada
+      }
+    creditos.push(credito);
+    pintarCreditos(creditos);
+  }
+
+  function buscarCreditos(cedula){
+    let elementoCredito;
+    let creditosEncontrados = [];
+    for (let i = 0; i < creditos.length; i ++){
+      elementoCredito = creditos[i];
+      if(elementoCredito.cedula == cedula){
+        creditosEncontrados.push(elementoCredito);        
+      }
+    }
+    return creditosEncontrados;
+  }
+
+  function pintarCreditos(creditos){
+    let bodyTabla = document.getElementById("tablaCreditos");
+    let contenidoTabla = "";
+
+    for(let i = 0; i < creditos.length; i ++){
+      let arregloCreditos = creditos[i];
+
+      contenidoTabla +=
+      `<tr>
+          <td> ${arregloCreditos.cedula} </td>  
+          <td> ${arregloCreditos.nombre} </td>
+          <td> ${arregloCreditos.apellido} </td>
+          <td> $ ${arregloCreditos.monto} </td>
+          <td> ${arregloCreditos.tasa} % </td>
+          <td> ${arregloCreditos.plazo} año/s </td>
+          <td> $ ${(arregloCreditos.cuota).toFixed(2)} </td>
+      </tr>`
+    }
+    bodyTabla.innerHTML = contenidoTabla;
+  }
+
+  function buscarCreditosCliente(){
+    let cajaTextoCedulaBuscada = recuperaraTexto("buscarCedulaListado");
+    let cedulaBuscada = buscarCreditos(cajaTextoCedulaBuscada);
+    pintarCreditos(cedulaBuscada);
+  }
+  
