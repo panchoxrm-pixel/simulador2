@@ -204,6 +204,8 @@ function seleccionarCliente(cedula){
       }
     creditos.push(credito);
     pintarCreditos(creditos);
+    let botonAsignar = document.getElementById("btnAsignarCredito");
+    botonAsignar.disabled = true;
   }
 
   function buscarCreditos(cedula){
