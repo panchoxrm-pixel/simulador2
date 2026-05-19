@@ -3,6 +3,7 @@
   let creditos = [];
 
   let tasaInteres = 15;
+  let montoMaximo = 10000;
   let clienteSeleccionado = null;
   let cuotaCalculada = 0;
   let montoCalculado = 0;
@@ -16,6 +17,8 @@ function ocultarSecciones(){
     document.getElementById("clientes").classList.remove("activa");
     document.getElementById("credito").classList.remove("activa");
     document.getElementById("listaCreditos").classList.remove("activa");
+    document.getElementById("creditosVip").classList.remove("activa");
+    document.getElementById("acercaDe").classList.remove("activa");
 }
 
 function mostrarSeccion(id){
@@ -33,12 +36,23 @@ function guardarTasa(){
   }    
 }
 
+function guardarMontoMaximo(){
+  let montoMaximoEntero = recuperarInt("montoMaximo");
+  if(montoMaximoEntero >= 100 && montoMaximoEntero <= 10000){
+    mostrarTexto("mensajeMontoMaximo",`Monto máximo configurado correctamente: $ ${montoMaximoEntero}`);
+    montoMaximo = montoMaximoEntero;
+  } else {
+        mostrarTexto("mensajeMontoMaximo",`El monto debe estar entre $ 100 y $ 10000`);
+  }    
+}
+
 function guardarCliente(){
   let valorCedula = recuperaraTexto("cedula");
   let valorNombre = recuperaraTexto("nombre");
   let valorApellido = recuperaraTexto("apellido");
   let valorIngresos = recuperarInt("ingresos");
   let valorEgresos = recuperarInt("egresos");
+  let valorTelefono = recuperaraTexto("telefono");
 
   let clienteExistente = buscarCliente(valorCedula);
 
@@ -48,15 +62,18 @@ function guardarCliente(){
     nombre: valorNombre,
     apellido: valorApellido,
     ingresos: valorIngresos,
-    egresos: valorEgresos
+    egresos: valorEgresos,
+    telefono: valorTelefono
   };
   clientes.push(clienteNuevo);
   } else {
     clienteExistente.nombre = valorNombre;
     clienteExistente.apellido = valorApellido;
     clienteExistente.ingresos = valorIngresos;
-    clienteExistente.egresos = valorEgresos;  }
-  pintarClientes();  
+    clienteExistente.egresos = valorEgresos;
+    clienteExistente.telefono = valorTelefono;
+  }
+  pintarClientes();
   }
  
 function pintarClientes(){
@@ -73,6 +90,7 @@ function pintarClientes(){
           <td> ${arregloClientes.apellido} </td>
           <td> ${arregloClientes.ingresos} </td>
           <td> ${arregloClientes.egresos} </td>
+          <td> ${arregloClientes.telefono} </td>
           <td>
             <button onclick="seleccionarCliente('${arregloClientes.cedula}')">Actualizar</button>
             <button>Eliminar</button>
@@ -103,6 +121,7 @@ function seleccionarCliente(cedula){
         mostrarTextoEnCaja("apellido",clienteSeleccionado.apellido);
         mostrarTextoEnCaja("ingresos",clienteSeleccionado.ingresos);
         mostrarTextoEnCaja("egresos",clienteSeleccionado.egresos);
+        mostrarTextoEnCaja("telefono",clienteSeleccionado.telefono);
   }
 
   function limpiar(){
@@ -111,6 +130,8 @@ function seleccionarCliente(cedula){
         mostrarTextoEnCaja("apellido","");
         mostrarTextoEnCaja("ingresos","");
         mostrarTextoEnCaja("egresos","");
+        mostrarTextoEnCaja("telefono","");
+
         }
 
   function buscarClienteCredito(){
@@ -160,6 +181,12 @@ function seleccionarCliente(cedula){
 
     let monto = parseFloat(document.getElementById("montoCredito").value) || 0;
     // Va el cero por si acaso ingresan erróneamente algún dato o lo dejan vacío, lo cual devolvería NaN.
+
+    if (monto > montoMaximo) {
+    alert(`Error: El monto solicitado ($ ${monto}) supera el monto máximo permitido por el sistema ($ ${montoMaximo}).`);
+    mostrarTextoEnCaja("montoCredito", "");     
+    return;
+  }
 
     let plazoAnios = parseInt(document.getElementById("plazoCredito").value) || 0;
 
@@ -247,3 +274,25 @@ function seleccionarCliente(cedula){
     pintarCreditos(cedulaBuscada);
   }
   
+  function pintarCreditosVip(creditos){
+    let bodyTabla = document.getElementById("tablaCreditosVip");
+    let contenidoTabla = "";
+
+    for(let i = 0; i < creditos.length; i ++){
+      let arregloCreditosVip = creditos[i];
+      if (arregloCreditosVip.monto > 5000){      
+      contenidoTabla +=
+      `<tr>
+          <td> ${arregloCreditosVip.cedula} </td>  
+          <td> ${arregloCreditosVip.nombre} </td>
+          <td> ${arregloCreditosVip.apellido} </td>
+          <td> $ ${arregloCreditosVip.monto} </td>
+          <td> ${arregloCreditosVip.tasa} % </td>
+          <td> ${arregloCreditosVip.plazo} año/s </td>
+          <td> $ ${(arregloCreditosVip.cuota).toFixed(2)} </td>
+      </tr>`
+    }
+
+    }
+    bodyTabla.innerHTML = contenidoTabla;
+  }
